@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from core.utils.testutils import sample_user
 
-from accounts.models import User, Profile
+from accounts.models import User
 
 
 class UserModelTests(TestCase):
