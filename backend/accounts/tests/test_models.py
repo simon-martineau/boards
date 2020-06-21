@@ -45,7 +45,37 @@ class ProfileModelTests(TestCase):
 
     def setUp(self):
         self.user = sample_user()
-        self.user_profile = Profile.objects.create(user=self.user, username='testusername')
 
     def test_profile_str(self):
-        self.assertEqual(str(self.user_profile), f'{self.user_profile.username} ({self.user.email})')
+        """Test the profile string respresentation"""
+        self.user.profile.username = "testing username"
+        self.assertEqual(str(self.user.profile), f'{self.user.profile.username} ({self.user.email})')
+
+    def test_profile_gets_created_on_user_create(self):
+        """Test that an associated profile gets create with a user"""
+        self.assertTrue(hasattr(self.user, 'profile'))
+        self.assertTrue(hasattr(self.user.profile, 'username'))
+
+    def test_default_username_gets_created(self):
+        """Test that a default unique username gets created with the model"""
+        self.assertNotEqual(len(self.user.profile.username), 0)
+
+    def test_set_username_successful(self):
+        """Test setting a new username successfully"""
+        result = self.user.profile.set_username('newusername')
+        self.assertTrue(result)
+        self.assertEqual(self.user.profile.username, 'newusername')
+
+    def test_set_username_already_taken(self):
+        """Test setting a new username with name already taken"""
+        other_user = sample_user(email='another@marsimon.com')
+        other_user.profile.username = 'newprofileusername'
+        other_user.profile.save()
+
+        current_username = self.user.profile.username
+        result = self.user.profile.set_username(other_user.profile.username)
+
+        self.assertFalse(result)
+        self.assertNotEqual(self.user.profile.username, other_user.profile.username)
+        self.assertEqual(self.user.profile.username, current_username)
+        self.assertFalse(self.user.profile.is_username_chosen)

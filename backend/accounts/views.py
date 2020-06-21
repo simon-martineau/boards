@@ -1,8 +1,9 @@
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.settings import api_settings
 
-from accounts.serializers import AuthTokenSerializer, UserSerializer
+from core.permissions import ProfilePermission
+from accounts.models import Profile
+from accounts.serializers import AuthTokenSerializer, UserSerializer, ProfileSerializer
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -13,4 +14,12 @@ class CreateUserView(generics.CreateAPIView):
 class CreateTokenView(ObtainAuthToken):
     """View to obtain an authentification token"""
     serializer_class = AuthTokenSerializer
-    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+
+class ProfileView(generics.RetrieveUpdateAPIView):
+    """View to see a user's profile"""
+    permission_classes = (ProfilePermission,)
+    serializer_class = ProfileSerializer
+
+    def get_queryset(self):
+        return Profile.objects.all()

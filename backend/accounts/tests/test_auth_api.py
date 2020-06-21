@@ -4,7 +4,6 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from accounts.models import User
-from core.utils.testutils import sample_user
 
 
 CREATE_USER_URL = reverse('accounts:create')

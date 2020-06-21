@@ -1,5 +1,4 @@
 from django.db import models
-from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 
@@ -38,8 +37,19 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Profile(models.Model):
     """Profile associated to each user"""
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     username = models.CharField(max_length=255, unique=True)
+    is_username_chosen = models.BooleanField(default=False)  # If the user chose their name or still use the default one
 
     def __str__(self):
         return f'{self.username} ({self.user.email})'
+
+    def set_username(self, username: str) -> bool:
+        """Sets the username. Returns false is the username already exists"""
+        exists = Profile.objects.filter(username=username).exists()
+        if exists:
+            return False
+        self.username = username
+        self.is_username_chosen = True
+        self.save(update_fields=['username', 'is_username_chosen'])
+        return True

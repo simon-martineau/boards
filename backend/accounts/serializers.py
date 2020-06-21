@@ -1,10 +1,11 @@
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
+from django.http import HttpRequest
 
 from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer as DefaultAuthTokenSerializer
 
-from accounts.models import User
+from accounts.models import User, Profile
 
 
 # noinspection PyAbstractClass
@@ -56,3 +57,20 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    """Serializer for the Profile object"""
+    is_self = serializers.SerializerMethodField()
+
+    def get_is_self(self, obj: Profile):
+        """Returns if the user being serialized is the authenticated user"""
+        request = self.context.get('request')  # type: HttpRequest
+        if request:
+            if request.user.is_authenticated:
+                return obj == request.user.profile
+        return False
+
+    class Meta:
+        model = Profile
+        fields = ('username', 'is_self')
