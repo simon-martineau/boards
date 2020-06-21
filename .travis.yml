@@ -12,6 +12,6 @@ services:
 before_script: pip install docker-compose
 
 script:
-  - docker-compose -f docker-compose.dev.yml run backend sh -c "coverage run manage.py test && flake8"
+  - docker-compose -f docker-compose.dev.yml run backend sh -c "flake8 && coverage run --source='.' manage.py test && coverage xml"
   - pip install coverage
   - bash <(curl -s https://codecov.io/bash)
