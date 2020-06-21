@@ -1,4 +1,8 @@
 language: python
+
+env:
+  - CODECOV_TOKEN="315788ec-888a-4450-95f6-024e823f512f"
+
 python:
   - "3.8"
 
@@ -8,4 +12,5 @@ services:
 before_script: pip install docker-compose
 
 script:
-  - docker-compose -f docker-compose.dev.yml run backend sh -c "python manage.py test && flake8"
+  - docker-compose -f docker-compose.dev.yml run backend sh -c "coverage run manage.py test && flake8"
+  - bash <(curl -s https://codecov.io/bash)
