@@ -4,10 +4,12 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from accounts.models import User
+from core.utils.testutils import sample_user
 
 
 CREATE_USER_URL = reverse('accounts:create')
 TOKEN_URL = reverse('accounts:token')
+MANAGE_URL = reverse('accounts:manage')
 
 
 class PublicUserApiTests(TestCase):
@@ -36,7 +38,7 @@ class PublicUserApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_password_too_short(self):
+    def test_create_password_too_short(self):
         """Test that the password must be more than 5 characters"""
         payload = {'email': 'test@marsimon.com', 'password': 'pw'}
         res = self.client.post(CREATE_USER_URL, payload)
@@ -80,3 +82,30 @@ class PublicUserApiTests(TestCase):
 
         self.assertNotIn('token', res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class PrivateUserApiTests(TestCase):
+    """Test the users API (public)"""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = sample_user()
+        self.client.force_authenticate(self.user)
+
+    def test_update_user_password_patch(self):
+        """Test updating the user's password"""
+        payload = {'password': 'newpassword123'}
+        res = self.client.patch(MANAGE_URL, payload)
+
+        self.user.refresh_from_db()
+        self.assertTrue(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(self.user.check_password(payload['password']))
+
+    def test_update_user_password_put(self):
+        """Test updating the user's password"""
+        payload = {'email': 'testing@marsimon.com', 'password': 'newpassword123'}
+        res = self.client.put(MANAGE_URL, payload)
+
+        self.user.refresh_from_db()
+        self.assertTrue(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(self.user.check_password(payload['password']))
