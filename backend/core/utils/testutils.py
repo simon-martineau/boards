@@ -1,3 +1,7 @@
+from typing import Iterable, Any, Union, Container
+
+from rest_framework.test import APITestCase as DefaultAPITestCase
+
 from accounts.models import User, Profile
 from boards.models import Board, Topic
 
@@ -50,3 +54,18 @@ def sample_topic(starter: Profile, board: Board, **params) -> Topic:
     }
     defaults.update(params)
     return Topic.objects.create(starter=starter, board=board, **params)
+
+
+class APITestCase(DefaultAPITestCase):
+    """Testcase class containing utility methods"""
+
+    def assertAllIn(self, members: Iterable[Any], container: Union[Iterable[Any], Container[Any]],
+                    msg: Any = ...) -> None:
+        """Asserts that all elements are in the container"""
+        for element in members:
+            self.assertIn(element, container, msg)
+
+    def assertDictMatchesAttrs(self, _dict: dict, _object: object, msg: Any = ...) -> None:
+        """Asserts all dictionary values match an object's attributes"""
+        for key in _dict.keys():
+            self.assertEqual(_dict[key], getattr(_object, key))
