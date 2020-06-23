@@ -29,18 +29,21 @@ class PublicBoardsApiTests(APITestCase):
 
     def test_retrieve_board_list(self):
         """Test retrieving a list of board"""
-        sample_board(title='Test board', description='Test board description')
+        board = sample_board(title='Test board', description='Test board description')
+        sample_topic(self.user.profile, board)
         sample_board(title='Another test board', description='Another test board description')
 
         res = self.client.get(BOARDS_URL)
 
-        boards = Board.objects.all().order_by('-id')
+        boards = Board.objects.all().order_by('id')
         serializer = BoardSerializer(boards, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
         self.assertEqual(len(res.data), 2)
-        self.assertAllIn(('id', 'title', 'description'), res.data[0].keys())
+        self.assertAllIn(('id', 'title', 'description', 'topics', 'created_at'), res.data[0].keys())
+        self.assertAllIn(('id', 'title'), res.data[0]['topics'][0].keys())
+
 
     def test_retrieve_board_details(self):
         """Test retrieving a board's details"""
@@ -80,7 +83,7 @@ class PublicBoardsApiTests(APITestCase):
         }
         res = self.client.post(BOARDS_URL, payload)
 
-        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_updating_board(self):
         """Test updating a board"""
@@ -105,7 +108,6 @@ class PublicBoardsApiTests(APITestCase):
         }
 
         res = self.client.patch(detail_board_url(board), payload)
-
-        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         board.refresh_from_db()
         self.assertEqual(board.description, old_description)

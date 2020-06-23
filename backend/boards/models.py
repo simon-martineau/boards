@@ -19,7 +19,6 @@ class Topic(models.Model):
     board = models.ForeignKey('Board', on_delete=models.CASCADE, related_name='topics')
 
     title = models.CharField(unique=True, max_length=255)
-    description = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
