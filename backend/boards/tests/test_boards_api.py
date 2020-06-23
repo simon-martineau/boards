@@ -44,7 +44,6 @@ class PublicBoardsApiTests(APITestCase):
         self.assertAllIn(('id', 'title', 'description', 'topics', 'created_at'), res.data[0].keys())
         self.assertAllIn(('id', 'title'), res.data[0]['topics'][0].keys())
 
-
     def test_retrieve_board_details(self):
         """Test retrieving a board's details"""
         board = sample_board()
@@ -96,6 +95,10 @@ class PublicBoardsApiTests(APITestCase):
         }
 
         res = self.client.patch(detail_board_url(board), payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        board.refresh_from_db()
+        self.assertEqual(board.description, payload['description'])
 
     def test_update_board_fails_for_basic_user(self):
         """Test that basic users cannot update a board"""
