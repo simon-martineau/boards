@@ -21,12 +21,6 @@ class PublicBoardsApiTests(APITestCase):
     def setUp(self):
         self.user = sample_user()
 
-    def generate_sample_data(self, user) -> None:
-        """Generates a sample board, topic and post for testing"""
-        self.board = sample_board()
-        self.topic = sample_topic(user.profile, self.board)
-        self.post = Post.objects.create(author=user.profile, message='Test post message', topic=self.topic)
-
     def test_retrieve_board_list(self):
         """Test retrieving a list of board"""
         board = sample_board(title='Test board', description='Test board description')
