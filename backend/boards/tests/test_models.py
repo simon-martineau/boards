@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from core.utils.testutils import sample_board, sample_user, sample_topic
-from boards.models import Topic, Post
+from core.extensions.test import sample_board, sample_user, sample_topic
+from boards.models import Post
 
 
 class BoardTests(TestCase):

@@ -1,9 +1,10 @@
 from django.urls import reverse
+from django.test.client import RequestFactory
 
 from rest_framework import status
 
-from core.utils.testutils import sample_topic, sample_user, sample_board, APITestCase
-from boards.models import Board, Post
+from core.extensions.test import sample_topic, sample_user, sample_board, APITestCase
+from boards.models import Board
 from boards.serializers import BoardSerializer
 
 
@@ -15,8 +16,8 @@ def detail_board_url(board: Board) -> str:
     return reverse('boards:board-detail', args=(board.id,))
 
 
-class PublicBoardsApiTests(APITestCase):
-    """Tests for the publicly available boards api"""
+class PublicBoardApiTests(APITestCase):
+    """Tests for the publicly available board api"""
 
     def setUp(self):
         self.user = sample_user()
@@ -30,22 +31,23 @@ class PublicBoardsApiTests(APITestCase):
         res = self.client.get(BOARDS_URL)
 
         boards = Board.objects.all().order_by('id')
-        serializer = BoardSerializer(boards, many=True)
+        serializer = BoardSerializer(boards, many=True, context={'request': RequestFactory().get(BOARDS_URL)})
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
         self.assertEqual(len(res.data), 2)
         self.assertAllIn(('id', 'title', 'description', 'topics', 'created_at'), res.data[0].keys())
-        self.assertAllIn(('id', 'title'), res.data[0]['topics'][0].keys())
+        self.assertAllIn(('href', 'title'), res.data[0]['topics'][0].keys())
 
     def test_retrieve_board_details(self):
         """Test retrieving a board's details"""
         board = sample_board()
         topic = sample_topic(self.user.profile, board)
+        url = detail_board_url(board)
 
-        res = self.client.get(detail_board_url(board))
+        res = self.client.get(url)
 
-        serializer = BoardSerializer(board)
+        serializer = BoardSerializer(board, context={'request': RequestFactory().get(url)})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
         self.assertEqual(res.data['topics'][0]['title'], topic.title)

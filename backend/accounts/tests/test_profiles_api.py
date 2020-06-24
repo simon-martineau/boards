@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from accounts.models import Profile
-from core.utils.testutils import sample_user
+from core.extensions.test import sample_user
 
 
 PROFILE_BASE_URL = '/api/users/profiles'

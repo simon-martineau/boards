@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from core.utils.testutils import sample_user
+from core.extensions.test import sample_user
 
 from accounts.models import User
 

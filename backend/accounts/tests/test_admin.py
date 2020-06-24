@@ -1,8 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from accounts.models import User
-from core.utils.testutils import sample_user
+from core.extensions.test import sample_user
 
 
 class AdminSiteTests(TestCase):

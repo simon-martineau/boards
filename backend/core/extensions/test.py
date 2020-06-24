@@ -50,7 +50,6 @@ def sample_topic(starter: Profile, board: Board, **params) -> Topic:
     """
     defaults = {
         'title': 'Testing Topic',
-        'description': 'Testing topic description'
     }
     defaults.update(params)
     return Topic.objects.create(starter=starter, board=board, **params)

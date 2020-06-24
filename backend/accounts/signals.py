@@ -12,7 +12,7 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         while 1:
             try:
-                Profile.objects.create(user=instance, username='guest' + secrets.token_hex(8))
+                Profile.objects.create(user=instance, username='guest' + secrets.token_hex(4))
                 break
             except IntegrityError:  # pragma: no cover
                 pass
