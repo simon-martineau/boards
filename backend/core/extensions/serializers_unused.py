@@ -2,7 +2,7 @@ from typing import Any, Union, Tuple, List
 
 from rest_framework.serializers import ModelSerializer
 
-from core.extensions.relations import ComplexHyperlinkedIdentityField
+from core.extensions.relations_unused import ComplexHyperlinkedIdentityField
 
 
 class DynamicFieldsModelSerializer(ModelSerializer):
