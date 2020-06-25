@@ -9,10 +9,24 @@ from boards.models import Board, Topic, Post
 
 class PostSerializer(serializers.ModelSerializer):
     """Serializer for the post object"""
+    author = ProfileWithHyperlinkSerializer(read_only=True)
 
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ('id', 'topic', 'message', 'created_at', 'edited_at', 'author')
+        read_only_fields = ('id', 'topic', 'created_at', 'edited_at', 'author')
+
+    def update(self, instance: Post, validated_data):
+        message = validated_data.pop('message')
+        instance.edit_message(message)
+        return super().update(instance, validated_data)
+
+    def create(self, validated_data: dict) -> Post:
+        """Takes the message field and created a starting post for a new topic"""
+        request = self.context['request']  # type: HttpRequest
+        validated_data['author'] = request.user.profile
+
+        return super().create(validated_data)
 
 
 class TopicWithHyperLinkSerializer(serializers.ModelSerializer):
@@ -52,7 +66,7 @@ class TopicListSerializer(serializers.ModelSerializer):
     post_count = serializers.SerializerMethodField()
 
     def get_first_post(self, obj: Topic):
-        return PostSerializer(obj.posts.order_by('created_at').first(), read_only=True).data
+        return PostSerializer(obj.posts.order_by('created_at').first(), read_only=True, context=self.context).data
 
     def get_post_count(self, obj: Topic):
         return obj.posts.count()

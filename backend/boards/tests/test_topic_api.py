@@ -5,7 +5,7 @@ from rest_framework import status
 
 from core.extensions.test import APITestCase, sample_topic, sample_user, sample_board
 from boards.models import Board, Topic, Post
-from boards.serializers import TopicSerializer, TopicListSerializer, CreateTopicSerializer
+from boards.serializers import TopicSerializer, TopicListSerializer
 
 
 def get_topic_url(board: Board, topic: Topic = None) -> str:

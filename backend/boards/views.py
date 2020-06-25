@@ -2,9 +2,10 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from boards.models import Board, Topic, Post
-from boards.serializers import BoardSerializer, TopicSerializer, CreateTopicSerializer, TopicListSerializer
+from boards.serializers import (BoardSerializer, TopicSerializer, CreateTopicSerializer, TopicListSerializer,
+                                PostSerializer)
 
-from core.permissions import ReadOnlyUnlessSuperuser, TopicPermission
+from core.permissions import ReadOnlyUnlessSuperuser, TopicPermission, PostPermission
 
 
 class BoardViewSet(NestedViewSetMixin, ModelViewSet):
@@ -31,3 +32,13 @@ class TopicViewSet(NestedViewSetMixin, ModelViewSet):
         if self.request.method == 'POST':
             return CreateTopicSerializer
         return self.serializer_class
+
+
+class PostViewSet(NestedViewSetMixin, ModelViewSet):
+    """Viewset for the post model"""
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = (PostPermission,)
+
+    def perform_create(self, serializer):
+        serializer.save(topic_id=self.kwargs['parent_lookup_topic'])
