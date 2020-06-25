@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from accounts.models import User
-from core.utils.testutils import sample_user
+from core.extensions.test import sample_user
 
 
 CREATE_USER_URL = reverse('accounts:create')
@@ -78,7 +78,7 @@ class PublicUserApiTests(TestCase):
 
     def test_create_token_missing_field(self):
         """Test that email and password are required"""
-        res = self.client.post(TOKEN_URL, {'email': 'one', 'password': ''})
+        res = self.client.post(TOKEN_URL, {'password': 'test'})
 
         self.assertNotIn('token', res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
