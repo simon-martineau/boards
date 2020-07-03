@@ -85,7 +85,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_is_self(self, obj: Profile) -> bool:
         """Returns if the user being serialized is the authenticated user"""
-        request = self.context.get('request')  # type: HttpRequest
+        request: HttpRequest = self.context.get('request')
         if request:
             if request.user.is_authenticated:
                 return obj == request.user.profile

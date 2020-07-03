@@ -23,7 +23,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict) -> Post:
         """Takes the message field and created a starting post for a new topic"""
-        request = self.context['request']  # type: HttpRequest
+        request: HttpRequest = self.context['request']
         validated_data['author'] = request.user.profile
 
         return super().create(validated_data)
@@ -90,7 +90,7 @@ class CreateTopicSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict) -> Topic:
         """Takes the message field and created a starting post for a new topic"""
-        request = self.context['request']  # type: HttpRequest
+        request: HttpRequest = self.context['request']
         message = validated_data.pop('message')
         validated_data['starter'] = request.user.profile
         topic = super().create(validated_data)

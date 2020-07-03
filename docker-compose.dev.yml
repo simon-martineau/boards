@@ -11,10 +11,12 @@ services:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASS=devpassword
-    ports:
-      - 8000:8000
+    expose:
+      - 8000
     volumes:
       - ./backend:/code
+      - static_volume:/code/staticfiles
+      - media_volume:/code/media
     command: /start_dev.sh
     depends_on:
       - postgres
@@ -31,6 +33,21 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
+  nginx:
+    build:
+      context: ./nginx/dev
+      dockerfile: Dockerfile
+    container_name: nginx
+    ports:
+      - 8000:80
+    volumes:
+      - static_volume:/home/app/web/static
+      - media_volume:/home/app/web/media
+    depends_on:
+      - backend
+
 
 volumes:
   postgres_data:
+  static_volume:
+  media_volume:
